@@ -1,0 +1,33 @@
+# OS and editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Java
+target/
+*.class
+
+# Node
+node_modules/
+dist/
+build/
+
+# Logs
+*.log
+
+# Local environment
+.env
+.env.*
+!.env.example
+
+# Terraform
+.terraform/
+tfplan
+*.tfplan
+*.tfstate
+*.tfstate.*
+*.tfvars
+
+# Local uploads
+uploads/

@@ -1,0 +1,52 @@
+frontend:
+  replicaCount: 1
+  image:
+    repository: photo-storage-frontend
+    tag: local
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 80
+
+backend:
+  replicaCount: 1
+
+  healthCheck:
+    enabled: false
+    path: /actuator/health
+
+  serviceAccount:
+    create: true
+    name: photo-storage-backend
+    annotations: {}
+
+  image:
+    repository: photo-storage-api
+    tag: local
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8080
+  env:
+    cloudProvider: local
+    storageProvider: local
+    replicationEnabled: false
+    replicationTargetProvider: ""
+    s3BucketName: ""
+    gcsBucketName: ""
+    frontendUrl: http://localhost:3000
+    datasourceUrl: jdbc:postgresql://postgres:5432/photo_storage
+    datasourceUsername: photo_user
+    datasourcePassword: ""
+
+ingress:
+  enabled: false
+  className: ""
+  host: photo-storage.local
+  annotations: {}
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 70

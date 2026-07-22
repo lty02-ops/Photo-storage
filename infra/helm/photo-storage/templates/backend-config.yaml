@@ -1,0 +1,15 @@
+{{- if .Values.backend.healthCheck.enabled }}
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: {{ .Release.Name }}-backend-config
+spec:
+  healthCheck:
+    type: HTTP
+    requestPath: {{ .Values.backend.healthCheck.path }}
+    port: {{ .Values.backend.service.port }}
+    checkIntervalSec: 15
+    timeoutSec: 5
+    healthyThreshold: 1
+    unhealthyThreshold: 2
+{{- end }}

@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: photo-storage-api
+  datasource:
+    url: jdbc:postgresql://localhost:5432/photo_storage
+    username: photo_user
+    password: ${SPRING_DATASOURCE_PASSWORD:}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+
+storage:
+  provider: ${STORAGE_PROVIDER:local}
+  max-upload-size-mb: 10
+  local-dir: uploads
+
+  replication:
+    enabled: ${STORAGE_REPLICATION_ENABLED:false}
+    target-provider: ${STORAGE_REPLICATION_TARGET_PROVIDER:}
+    poll-interval-ms: ${STORAGE_REPLICATION_POLL_INTERVAL_MS:10000}
+
+  s3:
+    bucket-name: ${S3_BUCKET_NAME:}
+  gcs:
+    bucket-name: ${GCS_BUCKET_NAME:}
+
+app:
+  cloud-provider: ${CLOUD_PROVIDER:local}
+  frontend-url: ${FRONTEND_URL:http://localhost:5173}

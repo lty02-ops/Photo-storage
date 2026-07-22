@@ -1,0 +1,22 @@
+frontend:
+  image:
+    repository: photo-storage-frontend
+    tag: local
+    pullPolicy: IfNotPresent
+
+backend:
+  image:
+    repository: photo-storage-api
+    tag: local
+    pullPolicy: IfNotPresent
+  env:
+    storageProvider: local
+    frontendUrl: http://photo-storage.local
+    datasourceUrl: jdbc:postgresql://postgres:5432/photo_storage
+    datasourceUsername: photo_user
+    datasourcePassword: ""
+
+ingress:
+  enabled: true
+  className: nginx
+  host: photo-storage.local
