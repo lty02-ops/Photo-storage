@@ -12,6 +12,13 @@ resource "google_project_service" "service_networking_api" {
   disable_on_destroy = false
 }
 
+resource "google_project_service" "database_migration_api" {
+  project = var.project_id
+  service = "datamigration.googleapis.com"
+
+  disable_on_destroy = false
+}
+
 resource "google_compute_global_address" "cloud_sql_private_range" {
   name          = "photo-storage-cloud-sql-range"
   project       = var.project_id
@@ -34,6 +41,15 @@ resource "google_service_networking_connection" "cloud_sql_private_connection" {
   depends_on = [
     google_project_service.service_networking_api
   ]
+}
+
+resource "google_compute_network_peering_routes_config" "cloud_sql_custom_routes" {
+  project = var.project_id
+  network = google_compute_network.photo_storage.name
+  peering = google_service_networking_connection.cloud_sql_private_connection.peering
+
+  import_custom_routes = true
+  export_custom_routes = true
 }
 
 resource "google_sql_database_instance" "photo_storage" {
