@@ -57,3 +57,7 @@ output "aws_load_balancer_controller_role_arn" {
 output "eks_oidc_issuer_url" {
   value = aws_eks_cluster.photo_storage_eks.identity[0].oidc[0].issuer
 }
+
+output "gcp_backend_s3_role_arn" {
+  value = aws_iam_role.gcp_backend_s3_role.arn
+}

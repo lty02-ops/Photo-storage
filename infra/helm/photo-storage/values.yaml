@@ -20,6 +20,12 @@ backend:
     name: photo-storage-backend
     annotations: {}
 
+  awsWorkloadIdentity:
+    enabled: false
+    roleArn: ""
+    region: ap-northeast-2
+    audience: sts.amazonaws.com
+
   gcpWorkloadIdentity:
     enabled: false
     projectNumber: ""

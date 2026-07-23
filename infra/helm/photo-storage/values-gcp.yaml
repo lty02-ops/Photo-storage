@@ -19,7 +19,14 @@ backend:
     name: photo-storage-backend
     annotations:
       iam.gke.io/gcp-service-account: photo-storage-backend@YOUR_GCP_PROJECT_ID.iam.gserviceaccount.com
-  
+
+  awsWorkloadIdentity:
+    enabled: true
+    roleArn: arn:aws:iam::YOUR_AWS_ACCOUNT_ID:role/photo-storage-gcp-backend-s3-role
+    region: ap-northeast-2
+    audience: sts.amazonaws.com
+
+
   image:
     repository: asia-northeast3-docker.pkg.dev/YOUR_GCP_PROJECT_ID/photo-storage/photo-storage-backend
     tag: latest

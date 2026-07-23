@@ -30,13 +30,24 @@ spec:
             - name: GOOGLE_APPLICATION_CREDENTIALS
               value: /var/run/gcp/credentials.json
             {{ end }}
+            {{ if .Values.backend.awsWorkloadIdentity.enabled }}
+            - name: AWS_ROLE_ARN
+              value: {{ .Values.backend.awsWorkloadIdentity.roleArn | quote }}
+            - name: AWS_WEB_IDENTITY_TOKEN_FILE
+              value: /var/run/aws/token
+            - name: AWS_REGION
+              value: {{ .Values.backend.awsWorkloadIdentity.region | quote }}
+            - name: AWS_DEFAULT_REGION
+              value: {{ .Values.backend.awsWorkloadIdentity.region | quote }}
+            {{ end }}
           envFrom:
             - configMapRef:
                 name: {{ .Release.Name }}-config
             - secretRef:
                 name: {{ .Release.Name }}-secret
-          {{ if .Values.backend.gcpWorkloadIdentity.enabled }}
+          {{ if or .Values.backend.gcpWorkloadIdentity.enabled .Values.backend.awsWorkloadIdentity.enabled }}
           volumeMounts:
+            {{ if .Values.backend.gcpWorkloadIdentity.enabled }}
             - name: gcp-token
               mountPath: /var/run/gcp/token
               subPath: token
@@ -45,9 +56,39 @@ spec:
               mountPath: /var/run/gcp/credentials.json
               subPath: credentials.json
               readOnly: true
+            {{ end }}
+            {{ if .Values.backend.awsWorkloadIdentity.enabled }}
+            - name: aws-token
+              mountPath: /var/run/aws
+              readOnly: true
+            {{ end }}
           {{ end }}
-      {{ if .Values.backend.gcpWorkloadIdentity.enabled }}
+
+        {{ if .Values.backend.awsWorkloadIdentity.enabled }}
+        - name: aws-token-refresher
+          image: curlimages/curl:8.12.1
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -c
+          args:
+            - |
+              set -eu
+              while true; do
+                curl --fail --silent --show-error \
+                  --header "Metadata-Flavor: Google" \
+                  "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/identity?audience={{ .Values.backend.awsWorkloadIdentity.audience }}&format=full" \
+                  --output /var/run/aws/token.tmp
+                mv /var/run/aws/token.tmp /var/run/aws/token
+                sleep 3000
+              done
+          volumeMounts:
+            - name: aws-token
+              mountPath: /var/run/aws
+        {{ end }}
+      {{ if or .Values.backend.gcpWorkloadIdentity.enabled .Values.backend.awsWorkloadIdentity.enabled }}
       volumes:
+        {{ if .Values.backend.gcpWorkloadIdentity.enabled }}
         - name: gcp-token
           projected:
             sources:
@@ -58,4 +99,9 @@ spec:
         - name: gcp-credentials
           configMap:
             name: {{ .Release.Name }}-gcp-credentials
+        {{ end }}
+        {{ if .Values.backend.awsWorkloadIdentity.enabled }}
+        - name: aws-token
+          emptyDir: {}
+        {{ end }}
       {{ end }}

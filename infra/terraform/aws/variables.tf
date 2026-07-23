@@ -27,3 +27,8 @@ variable "bucket_suffix" {
   type        = string
   default     = "lty02"
 }
+
+variable "gcp_backend_service_account_subject" {
+  description = "Unique ID of the GCP backend service account"
+  type        = string
+}
