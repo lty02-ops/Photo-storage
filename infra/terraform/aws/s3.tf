@@ -1,5 +1,6 @@
 resource "aws_s3_bucket" "photo_storage_s3_bucket" {
-  bucket = "photo-storage-bucket-${var.environment}-${var.bucket_suffix}"
+  bucket        = "photo-storage-bucket-${var.environment}-${var.bucket_suffix}"
+  force_destroy = true
 
   tags = {
     Name        = "photo-storage-bucket"
