@@ -26,3 +26,7 @@ output "backend_service_account_subject" {
   description = "Unique subject ID of the GCP backend service account"
   value       = google_service_account.backend.unique_id
 }
+
+output "network_id" {
+  value = google_compute_network.photo_storage.id
+}

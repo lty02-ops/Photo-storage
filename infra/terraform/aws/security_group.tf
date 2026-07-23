@@ -73,6 +73,18 @@ resource "aws_security_group" "photo_storage_db_sg" {
     security_groups = [aws_eks_cluster.photo_storage_eks.vpc_config[0].cluster_security_group_id]
   }
 
+  ingress {
+    description = "PostgreSQL from GKE and Cloud SQL over the multi-cloud VPN"
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = [
+      "10.10.0.0/20",
+      "10.20.0.0/16",
+      "10.40.0.0/16"
+    ]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
