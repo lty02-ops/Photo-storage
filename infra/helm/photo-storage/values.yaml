@@ -20,6 +20,13 @@ backend:
     name: photo-storage-backend
     annotations: {}
 
+  gcpWorkloadIdentity:
+    enabled: false
+    projectNumber: ""
+    poolId: photo-storage-aws-eks
+    providerId: photo-storage-eks
+    serviceAccountEmail: ""
+
   image:
     repository: photo-storage-api
     tag: local

@@ -11,6 +11,13 @@ backend:
     annotations:
       eks.amazonaws.com/role-arn: arn:aws:iam::YOUR_AWS_ACCOUNT_ID:role/photo-storage-backend-irsa-role
 
+  gcpWorkloadIdentity:
+    enabled: true
+    projectNumber: "YOUR_GCP_PROJECT_NUMBER"
+    poolId: photo-storage-aws-eks
+    providerId: photo-storage-eks
+    serviceAccountEmail: photo-storage-backend@YOUR_GCP_PROJECT_ID.iam.gserviceaccount.com
+
   image:
     repository: YOUR_AWS_ACCOUNT_ID.dkr.ecr.ap-northeast-2.amazonaws.com/photo-storage-backend
     tag: irsa-fix-1

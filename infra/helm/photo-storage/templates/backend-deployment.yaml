@@ -26,8 +26,36 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
+            {{ if .Values.backend.gcpWorkloadIdentity.enabled }}
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /var/run/gcp/credentials.json
+            {{ end }}
           envFrom:
             - configMapRef:
                 name: {{ .Release.Name }}-config
             - secretRef:
                 name: {{ .Release.Name }}-secret
+          {{ if .Values.backend.gcpWorkloadIdentity.enabled }}
+          volumeMounts:
+            - name: gcp-token
+              mountPath: /var/run/gcp/token
+              subPath: token
+              readOnly: true
+            - name: gcp-credentials
+              mountPath: /var/run/gcp/credentials.json
+              subPath: credentials.json
+              readOnly: true
+          {{ end }}
+      {{ if .Values.backend.gcpWorkloadIdentity.enabled }}
+      volumes:
+        - name: gcp-token
+          projected:
+            sources:
+              - serviceAccountToken:
+                  path: token
+                  audience: {{ printf "https://iam.googleapis.com/projects/%s/locations/global/workloadIdentityPools/%s/providers/%s" .Values.backend.gcpWorkloadIdentity.projectNumber .Values.backend.gcpWorkloadIdentity.poolId .Values.backend.gcpWorkloadIdentity.providerId | quote }}
+                  expirationSeconds: 3600
+        - name: gcp-credentials
+          configMap:
+            name: {{ .Release.Name }}-gcp-credentials
+      {{ end }}

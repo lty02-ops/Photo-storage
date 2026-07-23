@@ -19,3 +19,8 @@ variable "db_password" {
   type        = string
   sensitive   = true
 }
+
+variable "aws_eks_oidc_issuer_url" {
+  description = "AWS EKS OIDC issuer URL"
+  type        = string
+}
