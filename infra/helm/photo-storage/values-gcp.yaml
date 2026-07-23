@@ -2,7 +2,7 @@ frontend:
   service:
     type: NodePort
   image:
-    repository: asia-northeast3-docker.pkg.dev/YOUR_GCP_PROJECT_ID/photo-storage/photo-storage-frontend
+    repository: asia-northeast3-docker.pkg.dev/project-62b51d1b-b1c4-4053-bb0/photo-storage/photo-storage-frontend
     tag: latest
     pullPolicy: IfNotPresent
 
@@ -18,17 +18,17 @@ backend:
     create: true
     name: photo-storage-backend
     annotations:
-      iam.gke.io/gcp-service-account: photo-storage-backend@YOUR_GCP_PROJECT_ID.iam.gserviceaccount.com
+      iam.gke.io/gcp-service-account: photo-storage-backend@project-62b51d1b-b1c4-4053-bb0.iam.gserviceaccount.com
 
   awsWorkloadIdentity:
     enabled: true
-    roleArn: arn:aws:iam::YOUR_AWS_ACCOUNT_ID:role/photo-storage-gcp-backend-s3-role
+    roleArn: arn:aws:iam::022868553365:role/photo-storage-gcp-backend-s3-role
     region: ap-northeast-2
     audience: sts.amazonaws.com
 
 
   image:
-    repository: asia-northeast3-docker.pkg.dev/YOUR_GCP_PROJECT_ID/photo-storage/photo-storage-backend
+    repository: asia-northeast3-docker.pkg.dev/project-62b51d1b-b1c4-4053-bb0/photo-storage/photo-storage-backend
     tag: latest
     pullPolicy: IfNotPresent
 
@@ -37,10 +37,10 @@ backend:
     storageProvider: gcs
     replicationEnabled: true
     replicationTargetProvider: s3
-    gcsBucketName: YOUR_GCS_BUCKET_NAME
-    s3BucketName: YOUR_S3_BUCKET_NAME
+    gcsBucketName: project-62b51d1b-b1c4-4053-bb0-photo-storage-bucket
+    s3BucketName: photo-storage-bucket-dev-lty02
     frontendUrl: https://photo-storage.example.com
-    datasourceUrl: jdbc:postgresql://YOUR_DATABASE_HOST:5432/photo_storage
+    datasourceUrl: jdbc:postgresql://photo-storage-db.cr000kkwg7nd.ap-northeast-2.rds.amazonaws.com:5432/photo_storage
     datasourceUsername: photo_user
     datasourcePassword: ""
 

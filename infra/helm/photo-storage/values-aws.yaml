@@ -1,7 +1,7 @@
 frontend:
   image:
-    repository: YOUR_AWS_ACCOUNT_ID.dkr.ecr.ap-northeast-2.amazonaws.com/photo-storage-frontend
-    tag: nginx-fix-1
+    repository: 022868553365.dkr.ecr.ap-northeast-2.amazonaws.com/photo-storage-frontend
+    tag: latest
     pullPolicy: IfNotPresent
 
 backend:
@@ -9,18 +9,18 @@ backend:
     create: true
     name: photo-storage-backend
     annotations:
-      eks.amazonaws.com/role-arn: arn:aws:iam::YOUR_AWS_ACCOUNT_ID:role/photo-storage-backend-irsa-role
+      eks.amazonaws.com/role-arn: arn:aws:iam::022868553365:role/photo-storage-backend-irsa-role
 
   gcpWorkloadIdentity:
     enabled: true
-    projectNumber: "YOUR_GCP_PROJECT_NUMBER"
+    projectNumber: "1079817536617"
     poolId: photo-storage-aws-eks
     providerId: photo-storage-eks
-    serviceAccountEmail: photo-storage-backend@YOUR_GCP_PROJECT_ID.iam.gserviceaccount.com
+    serviceAccountEmail: photo-storage-backend@project-62b51d1b-b1c4-4053-bb0.iam.gserviceaccount.com
 
   image:
-    repository: YOUR_AWS_ACCOUNT_ID.dkr.ecr.ap-northeast-2.amazonaws.com/photo-storage-backend
-    tag: irsa-fix-1
+    repository: 022868553365.dkr.ecr.ap-northeast-2.amazonaws.com/photo-storage-backend
+    tag: latest
     pullPolicy: IfNotPresent
 
   env:
@@ -28,10 +28,10 @@ backend:
     storageProvider: s3
     replicationEnabled: true
     replicationTargetProvider: gcs
-    s3BucketName: YOUR_S3_BUCKET_NAME
-    gcsBucketName: YOUR_GCS_BUCKET_NAME
+    s3BucketName: photo-storage-bucket-dev-lty02
+    gcsBucketName: project-62b51d1b-b1c4-4053-bb0-photo-storage-bucket
     frontendUrl: https://photo-storage.example.com
-    datasourceUrl: jdbc:postgresql://YOUR_DATABASE_HOST:5432/photo_storage
+    datasourceUrl: jdbc:postgresql://photo-storage-db.cr000kkwg7nd.ap-northeast-2.rds.amazonaws.com:5432/photo_storage
     datasourceUsername: photo_user
     datasourcePassword: ""
     

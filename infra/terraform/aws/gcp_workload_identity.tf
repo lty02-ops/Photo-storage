@@ -11,7 +11,7 @@ data "aws_iam_policy_document" "gcp_backend_assume_role" {
     condition {
       test     = "StringEquals"
       variable = "accounts.google.com:aud"
-      values   = ["sts.amazonaws.com"]
+      values   = [var.gcp_backend_service_account_subject]
     }
 
     condition {
