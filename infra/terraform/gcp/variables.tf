@@ -23,4 +23,5 @@ variable "db_password" {
 variable "aws_eks_oidc_issuer_url" {
   description = "AWS EKS OIDC issuer URL"
   type        = string
+  default     = ""
 }

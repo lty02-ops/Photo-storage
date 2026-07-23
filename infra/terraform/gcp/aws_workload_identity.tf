@@ -14,6 +14,8 @@ resource "google_iam_workload_identity_pool" "aws_eks" {
 }
 
 resource "google_iam_workload_identity_pool_provider" "aws_eks" {
+  count = var.aws_eks_oidc_issuer_url != "" ? 1 : 0
+
   workload_identity_pool_id          = google_iam_workload_identity_pool.aws_eks.workload_identity_pool_id
   workload_identity_pool_provider_id = "photo-storage-eks"
   display_name                       = "Photo Storage EKS"
@@ -32,10 +34,15 @@ resource "google_iam_workload_identity_pool_provider" "aws_eks" {
 }
 
 resource "google_service_account_iam_member" "aws_backend_workload_identity" {
+  count = var.aws_eks_oidc_issuer_url != "" ? 1 : 0
+
   service_account_id = google_service_account.backend.name
   role               = "roles/iam.workloadIdentityUser"
 
   member = "principal://iam.googleapis.com/projects/${data.google_project.current.number}/locations/global/workloadIdentityPools/${google_iam_workload_identity_pool.aws_eks.workload_identity_pool_id}/subject/system:serviceaccount:photo-storage:photo-storage-backend"
 
-  depends_on = [google_project_service.iam_credentials_api]
+  depends_on = [
+    google_project_service.iam_credentials_api,
+    google_iam_workload_identity_pool_provider.aws_eks
+  ]
 }

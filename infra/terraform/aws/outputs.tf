@@ -59,7 +59,7 @@ output "eks_oidc_issuer_url" {
 }
 
 output "gcp_backend_s3_role_arn" {
-  value = aws_iam_role.gcp_backend_s3_role.arn
+  value = try(aws_iam_role.gcp_backend_s3_role[0].arn, null)
 }
 
 output "private_route_table_id" {
