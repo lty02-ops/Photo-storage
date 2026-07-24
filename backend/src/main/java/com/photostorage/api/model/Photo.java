@@ -41,7 +41,7 @@ public class Photo {
     private String objectKey;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "varchar(32) default 'PENDING'")
+    @Column(nullable = false, length = 32)
     private ReplicationStatus replicationStatus;
 
     private Instant replicatedAt;
