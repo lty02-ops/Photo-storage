@@ -26,6 +26,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 class PhotoServiceTest {
@@ -135,6 +136,7 @@ class PhotoServiceTest {
             "s3",
             "photo.webp"
         );
+        ReflectionTestUtils.setField(photo, "id", 1L);
         photo.markReplicationCompleted();
 
         ReplicationJob replicationJob = new ReplicationJob(
