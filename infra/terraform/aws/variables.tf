@@ -31,5 +31,4 @@ variable "bucket_suffix" {
 variable "gcp_backend_service_account_subject" {
   description = "Unique ID of the GCP backend service account"
   type        = string
-  default     = ""
 }

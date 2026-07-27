@@ -7,7 +7,7 @@ resource "google_project_service" "container_api" {
 
 resource "google_container_cluster" "photo_storage" {
   name     = "photo-storage-cluster"
-  location = var.zone
+  location = var.region
 
   remove_default_node_pool = true
   initial_node_count       = 1
@@ -34,7 +34,7 @@ resource "google_container_cluster" "photo_storage" {
 resource "google_container_node_pool" "primary" {
   name       = "primary-node-pool"
   cluster    = google_container_cluster.photo_storage.name
-  location   = var.zone
+  location   = var.region
   node_count = 1
 
 

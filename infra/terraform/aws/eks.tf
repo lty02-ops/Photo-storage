@@ -12,7 +12,6 @@ resource "aws_eks_cluster" "photo_storage_eks" {
 
     endpoint_private_access = true
     endpoint_public_access  = true
-    security_group_ids      = [aws_security_group.photo_storage_app_sg.id]
   }
 
   depends_on = [aws_iam_role_policy_attachment.eks_cluster_role_attachment]

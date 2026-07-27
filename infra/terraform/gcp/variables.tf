@@ -9,11 +9,6 @@ variable "region" {
   default     = "asia-northeast3"
 }
 
-variable "zone" {
-  type    = string
-  default = "asia-northeast3-a"
-}
-
 variable "db_password" {
   description = "Cloud SQL PostgreSQL password"
   type        = string
@@ -23,5 +18,4 @@ variable "db_password" {
 variable "aws_eks_oidc_issuer_url" {
   description = "AWS EKS OIDC issuer URL"
   type        = string
-  default     = ""
 }

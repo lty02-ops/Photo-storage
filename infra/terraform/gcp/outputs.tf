@@ -7,10 +7,7 @@ output "project_number" {
 }
 
 output "aws_workload_identity_provider" {
-  value = try(
-    google_iam_workload_identity_pool_provider.aws_eks[0].name,
-    null
-  )
+  value = google_iam_workload_identity_pool_provider.aws_eks.name
 }
 
 output "backend_service_account_email" {
