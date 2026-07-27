@@ -12,6 +12,7 @@ import com.photostorage.api.repository.PhotoRepository;
 import com.photostorage.api.repository.ReplicationJobRepository;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -125,7 +126,11 @@ public class PhotoService {
     }
 
     private StoredPhoto load(Photo photo) {
-        PhotoStorageService storageService = storageRegistry.get(photo.getStorageProvider());
+        return loadWithFallback(photo, photo.getStorageProvider(), null);
+    }
+
+    private StoredPhoto loadWithFallback(Photo photo, String provider, String attemptedProvider) {
+        PhotoStorageService storageService = storageRegistry.get(provider);
         try {
             return new StoredPhoto(
                     storageService.load(photo.getObjectKey()),
@@ -133,8 +138,35 @@ public class PhotoService {
                     photo.getContentType(),
                     photo.getSizeBytes());
         } catch (IOException exception) {
-            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to load photo.");
+            Optional<String> fallbackProvider = fallbackProvider(photo, provider, attemptedProvider);
+            if (fallbackProvider.isEmpty()) {
+                throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to load photo.");
+            }
+            return loadWithFallback(photo, fallbackProvider.get(), provider);
         }
+    }
+
+    private Optional<String> fallbackProvider(Photo photo, String provider, String attemptedProvider) {
+        if (photo.getReplicationStatus() != null
+                && photo.getReplicationStatus() == com.photostorage.api.model.ReplicationStatus.COMPLETED) {
+            Optional<ReplicationJob> replicationJob = replicationJobRepository.findByPhoto_Id(photo.getId());
+            if (replicationJob.isPresent()) {
+                ReplicationJob job = replicationJob.get();
+                String targetProvider = job.getTargetProvider();
+                String sourceProvider = job.getSourceProvider();
+                if (targetProvider != null && !targetProvider.isBlank()
+                        && !targetProvider.equalsIgnoreCase(provider)
+                        && !targetProvider.equalsIgnoreCase(attemptedProvider)) {
+                    return Optional.of(targetProvider);
+                }
+                if (sourceProvider != null && !sourceProvider.isBlank()
+                        && !sourceProvider.equalsIgnoreCase(provider)
+                        && !sourceProvider.equalsIgnoreCase(attemptedProvider)) {
+                    return Optional.of(sourceProvider);
+                }
+            }
+        }
+        return Optional.empty();
     }
 
     private void validateReplicationTarget(String sourceProvider) {
