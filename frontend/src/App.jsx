@@ -169,15 +169,23 @@ export default function App() {
   }
 
   async function createShareLink(photoId) {
+  try {
+    const result = await request(`/api/photos/${photoId}/share`, {
+      method: "POST",
+    });
+
+    const absoluteUrl = new URL(result.url, window.location.origin).href;
+
     try {
-      const result = await request(`/api/photos/${photoId}/share`, { method: "POST" });
-      const absoluteUrl = `${API_BASE_URL}${result.url}`;
       await navigator.clipboard.writeText(absoluteUrl);
       setMessage(`Share link copied: ${absoluteUrl}`);
-    } catch (error) {
-      setMessage(error.message);
+    } catch {
+      setMessage(`Share link created: ${absoluteUrl}`);
     }
+  } catch (error) {
+    setMessage(error.message);
   }
+}
 
   async function downloadPhoto(photo) {
     try {
