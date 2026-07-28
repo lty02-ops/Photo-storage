@@ -23,7 +23,19 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/photo_storage
       SPRING_DATASOURCE_USERNAME: photo_user
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in infra/.env}
+
+      SPRING_PROFILES_ACTIVE: oauth
+
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+
+      NAVER_CLIENT_ID: ${NAVER_CLIENT_ID}
+      NAVER_CLIENT_SECRET: ${NAVER_CLIENT_SECRET}
+
+      KAKAO_CLIENT_ID: ${KAKAO_CLIENT_ID}
+
       FRONTEND_URL: http://localhost:3000
+
     ports:
       - "8081:8080"
     depends_on:

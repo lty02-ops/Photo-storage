@@ -37,9 +37,11 @@ backend:
     repository: photo-storage-api
     tag: local
     pullPolicy: IfNotPresent
+
   service:
     type: ClusterIP
     port: 8080
+
   env:
     cloudProvider: local
     storageProvider: local
@@ -51,6 +53,18 @@ backend:
     datasourceUrl: jdbc:postgresql://postgres:5432/photo_storage
     datasourceUsername: photo_user
     datasourcePassword: ""
+
+  oauth:
+    google:
+      clientId: ""
+      clientSecret: ""
+
+    naver:
+      clientId: ""
+      clientSecret: ""
+
+    kakao:
+      clientId: ""
 
 ingress:
   enabled: false

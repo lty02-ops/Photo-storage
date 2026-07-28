@@ -71,15 +71,14 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
                 );
             }
             case "kakao" -> {
-                Object account = attributes.get("kakao_account");
-                if (!(account instanceof Map<?, ?> profile)) {
-                    throw new ServletException("Kakao account profile is missing.");
-                }
+                String providerUserId =
+                   requiredString(attributes, "id", "Kakao account id is missing.");
+
                 yield new SocialProfile(
-                    requiredString(attributes, "id", "Kakao account id is missing."),
-                    requiredString(profile, "email", "Kakao email is missing.")
-                );
-            }
+                    providerUserId,
+                    "kakao-" + providerUserId + "@oauth.local"
+                    );
+            }   
             default -> throw new ServletException("Unsupported OAuth2 provider: " + provider);
         };
     }

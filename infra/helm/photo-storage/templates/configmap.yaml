@@ -3,10 +3,11 @@ kind: ConfigMap
 metadata:
   name: {{ .Release.Name }}-config
 data:
+  SPRING_PROFILES_ACTIVE: "oauth"
   CLOUD_PROVIDER: {{ .Values.backend.env.cloudProvider | quote }}
   STORAGE_PROVIDER: {{ .Values.backend.env.storageProvider | quote }}
   S3_BUCKET_NAME: {{ .Values.backend.env.s3BucketName | quote }}
   GCS_BUCKET_NAME: {{ .Values.backend.env.gcsBucketName | quote }}
-  FRONTEND_URL: {{ .Values.backend.env.frontendUrl | quote }}
   STORAGE_REPLICATION_ENABLED: {{ .Values.backend.env.replicationEnabled | quote }}
   STORAGE_REPLICATION_TARGET_PROVIDER: {{ .Values.backend.env.replicationTargetProvider | quote }}
+  FRONTEND_URL: {{ .Values.backend.env.frontendUrl | quote }}
