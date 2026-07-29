@@ -14,14 +14,6 @@ output "backend_service_account_email" {
   value = google_service_account.backend.email
 }
 
-output "cloud_sql_private_ip" {
-  value = google_sql_database_instance.photo_storage.private_ip_address
-}
-
-output "cloud_sql_connection_name" {
-  value = google_sql_database_instance.photo_storage.connection_name
-}
-
 output "backend_service_account_subject" {
   description = "Unique subject ID of the GCP backend service account"
   value       = google_service_account.backend.unique_id
