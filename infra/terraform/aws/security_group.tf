@@ -74,7 +74,7 @@ resource "aws_security_group" "photo_storage_db_sg" {
   }
 
   ingress {
-    description = "PostgreSQL from GKE and Cloud SQL over the multi-cloud VPN"
+    description = "PostgreSQL from GKE over the multi-cloud VPN"
     from_port   = 5432
     to_port     = 5432
     protocol    = "tcp"

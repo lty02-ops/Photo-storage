@@ -43,11 +43,6 @@ variable "gcp_pod_cidr" {
   default = "10.20.0.0/16"
 }
 
-variable "cloud_sql_cidr" {
-  type    = string
-  default = "10.40.0.0/16"
-}
-
 variable "gcp_router_asn" {
   type    = number
   default = 64514

@@ -16,10 +16,5 @@ resource "google_compute_router" "photo_storage" {
     advertise_mode = "CUSTOM"
 
     advertised_groups = ["ALL_SUBNETS"]
-
-    advertised_ip_ranges {
-      range       = var.cloud_sql_cidr
-      description = "Cloud SQL private service range"
-    }
   }
 }
