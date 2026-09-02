@@ -20,9 +20,9 @@ EKS와 GKE에 같은 애플리케이션을 배포하고 두 클라우드를 VPN�
 
 ## 아키텍처
 
-### 전체 구성
+### 멀티클라우드 네트워크와 공유 데이터베이스
 
-![전체 아키텍처](docs/images/Photo_Storage_overall.png)
+![멀티클라우드 네트워크와 공유 데이터베이스](docs/images/Photo_Storage_overall.png)
 
 AWS에는 EKS, S3, RDS를 두었고 GCP에는 GKE와 Cloud Storage를 구성했습니다. EKS와 GKE에는 같은 Spring Boot 백엔드와 React 프론트엔드가 올라갑니다.
 
@@ -56,7 +56,7 @@ Pod 안에 AWS Access Key나 GCP Service Account 키를 저장하고 싶지 않�
 
 EKS에서 GCS에 접근할 때는 EKS ServiceAccount JWT를 GCP STS에 전달하여 GCP가 이 토큰을 확인하면 GCP Service Account 권한의 Access Token을 받아 GCS에 접근하게 했습니다.
 
-GKE에서 S3에 접근할 때는 Sidecar가 Google Identity Token을 받아 파일로 저장하고 AWS SDK가 이 파일을 읽어 `AssumeRoleWithWebIdentity`를 호출해 S3용 임시 자격증명을 받도록 했습니다.
+GKE에서 S3에 접근할 때는 직접 구성한 Token Refresher Sidecar가 Google Identity Token을 받아 파일로 저장하고 AWS SDK가 이 파일을 읽어 `AssumeRoleWithWebIdentity`를 호출해 S3용 임시 자격증명을 받도록 했습니다.
 
 사진 복제는 스토리지에서 자동으로 처리하는 방식이 아니기 때문에 사진을 먼저 기본 저장소에 저장하고 PostgreSQL에 복제 작업을 남기면 Spring Boot Worker가 작업을 읽어 반대쪽 저장소로 복사하게 했습니다. 한쪽 스토리지에 문제가 생겨도 원본 업로드까지 같이 실패하지 않도록 이 방법으로 설계하였습니다.
 
