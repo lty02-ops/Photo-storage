@@ -22,15 +22,13 @@ EKS와 GKE에 같은 애플리케이션을 배포하고 두 클라우드를 VPN�
 
 ### 전체 구성
 
-![전체 아키텍처](docs/images/architecture_all.png)
+![전체 아키텍처](docs/images/Photo_Storage_overall.png)
 
 AWS에는 EKS, S3, RDS를 두었고 GCP에는 GKE와 Cloud Storage를 구성했습니다. EKS와 GKE에는 같은 Spring Boot 백엔드와 React 프론트엔드가 올라갑니다.
 
 AWS에서 업로드한 사진은 S3에 먼저 저장한 뒤 GCS로 복제하고, GCP에서 업로드한 사진은 반대로 GCS에서 S3로 복제합니다.
 
 ### VPN과 데이터베이스
-
-![VPN 네트워크와 공유 데이터베이스](docs/images/architecture_vpn_db.png)
 
 데이터베이스를 클라우드별로 구성하면 별도로 데이터 동기화가 필요하기 때문에 AWS RDS PostgreSQL 하나를 EKS와 GKE 두 곳에서 공유하도록 구성하였습니다.
 
@@ -39,14 +37,15 @@ EKS 백엔드는 AWS VPC 내부에서 RDS에 접속하고, GKE 백엔드는 VPN�
 연결 통로는 다음과 같습니다.
 
 ```text
-GKE Backend Pod → GCP VPC → Cloud Router + BGP → GCP HA VPN Gateway → IPsec VPN Tunnel → AWS Virtual Private Gateway → AWS Database Route Table → Amazon RDS for PostgreSQL
+GKE Backend Pod → GCP VPC → Cloud Router + BGP → GCP HA VPN Gateway → IPsec VPN Tunnel
+→ AWS Virtual Private Gateway → AWS Database Route Table → Amazon RDS for PostgreSQL
 ```
 
 HA VPN 구성을 위해 IPsec 터널 4개와 각 터널에 대응하는 BGP 세션 4개를 사용했습니다. AWS에서는 Virtual Private Gateway가 학습한 GCP VPC 경로가 Private Route Table과 Database Route Table에 전파되도록 설정했습니다.
 
 ### 스토리지 권한
 
-![스토리지와 Cross-Cloud Identity](docs/images/architecture_storage_cross_cloud.png)
+![스토리지와 Cross-Cloud Identity](docs/images/Photo_Storage_cross_cloud.png)
 
 Pod 안에 AWS Access Key나 GCP Service Account 키를 저장하고 싶지 않아 임시 자격증명을 사용했습니다.
 
@@ -63,7 +62,7 @@ GKE에서 S3에 접근할 때는 Sidecar가 Google Identity Token을 받아 파�
 
 ### 로그인과 CI
 
-![소셜 로그인과 CI](docs/images/architecture_social_login_CICD.png)
+![소셜 로그인과 CI](docs/images/Photo_Storage_social_login.png)
 
 소셜 로그인은 Spring Security OAuth2 Client로 구현했습니다. GitHub Actions에서는 백엔드 테스트, 프런트엔드 빌드, Helm Lint, Terraform Validate를 실행합니다.
 
