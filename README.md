@@ -19,8 +19,7 @@
 ### App
 
 ![Java 17](https://img.shields.io/badge/Java_17-ED8B00?style=flat-square&logo=openjdk&logoColor=white)
-![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=flat-square&logo=springboot&logoColor=white)
-![Spring Security](https://img.shields.io/badge/Spring_Security-6DB33F?style=flat-square&logo=springsecurity&logoColor=white)
+![Spring](https://img.shields.io/badge/Spring-6DB33F?style=flat-square&logo=spring&logoColor=white)
 ![React](https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=react&logoColor=black)
 ![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat-square&logo=vite&logoColor=white)
 ![Nginx](https://img.shields.io/badge/Nginx-009639?style=flat-square&logo=nginx&logoColor=white)
@@ -38,9 +37,6 @@
 ### Cloud
 
 ![AWS](https://img.shields.io/badge/AWS-232F3E?style=flat-square&logo=amazonwebservices&logoColor=white)
-![Amazon EKS](https://img.shields.io/badge/Amazon_EKS-FF9900?style=flat-square&logo=amazoneks&logoColor=white)
-![Amazon S3](https://img.shields.io/badge/Amazon_S3-569A31?style=flat-square&logo=amazons3&logoColor=white)
-![Amazon RDS](https://img.shields.io/badge/Amazon_RDS-527FFF?style=flat-square&logo=amazonrds&logoColor=white)
 ![Google Cloud](https://img.shields.io/badge/Google_Cloud-4285F4?style=flat-square&logo=googlecloud&logoColor=white)
 
 ## 아키텍처
@@ -133,7 +129,7 @@ AWS·GCP 배포 절차는 [클라우드 배포](docs/deployment.md)를 참고합
 
 ## Trouble Shooting
 
-### GKE에서 S3로 복제되지 않았던 문제
+### GKE에서 S3 사진 복제 실패
 
 | &nbsp;구&#8288;분&nbsp; | 내용 |
 |---|---|
@@ -141,7 +137,7 @@ AWS·GCP 배포 절차는 [클라우드 배포](docs/deployment.md)를 참고합
 | &nbsp;원&#8288;인&nbsp; | IAM Role의 Trust Policy 조건이 Google Identity Token의 `aud`, `azp`, `sub` 값과 일치하지 않았습니다. |
 | &nbsp;해&#8288;결&nbsp; | Trust Policy를 실제 토큰 값에 맞게 수정하여 Access Key 없이 S3에 접근하도록 했습니다. |
 
-### GKE Load Balancer가 UNHEALTHY로 나온 문제
+### GKE Load Balancer가 UNHEALTHY 상태
 
 | &nbsp;구&#8288;분&nbsp; | 내용 |
 |---|---|
@@ -149,21 +145,13 @@ AWS·GCP 배포 절차는 [클라우드 배포](docs/deployment.md)를 참고합
 | &nbsp;원&#8288;인&nbsp; | Service Port, BackendConfig, Health Check 설정이 맞지 않았습니다. |
 | &nbsp;해&#8288;결&nbsp; | Service Port와 BackendConfig 연결을 맞추고 Health Check가 `/actuator/health`를 확인하도록 수정하니 HEALTHY로 바뀌었습니다. |
 
-### VPN은 연결됐는데 RDS에 접속되지 않았던 문제
+### VPN 연결 후 RDS 접근 실패
 
 | &nbsp;구&#8288;분&nbsp; | 내용 |
 |---|---|
 | &nbsp;문&#8288;제&nbsp; | VPN Tunnel과 BGP 세션이 정상이라서 바로 통신될 것으로 생각했지만 GKE에서 RDS에 연결할 수 없었습니다. |
 | &nbsp;원&#8288;인&nbsp; | AWS Route Table의 경로 전파와 RDS Security Group의 접근 허용 설정이 필요했습니다. |
 | &nbsp;해&#8288;결&nbsp; | 확인해 보니 터널만 연결된 상태였고 AWS Route Table과 RDS Security Group 설정이 모두 끝난 것은 아니었습니다. VPN Gateway Route Propagation을 Private Route Table과 Database Route Table에 연결하고, RDS Security Group에서 GCP VPC 대역의 5432 포트를 허용해 해결했습니다. |
-
-### Terraform Destroy 중 VPC가 삭제되지 않은 문제
-
-| &nbsp;구&#8288;분&nbsp; | 내용 |
-|---|---|
-| &nbsp;문&#8288;제&nbsp; | 테스트 후 `terraform destroy`를 실행했을 때 VPC에 연결된 리소스가 남아 있다는 오류가 발생했습니다. |
-| &nbsp;원&#8288;인&nbsp; | Kubernetes Ingress가 만든 Load Balancer와 Security Group은 Terraform 코드에서 직접 만든 리소스가 아니어서 같이 정리되지 않았습니다. |
-| &nbsp;해&#8288;결&nbsp; | Helm 리소스와 Load Balancer를 먼저 제거하고, 남아 있는 스토리지 객체와 네트워크 의존성을 확인한 뒤 다시 삭제했습니다. |
 
 
 ## 배운 점
