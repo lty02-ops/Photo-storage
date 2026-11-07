@@ -4,8 +4,6 @@
 
 약 3개월간 진행했으며, AWS와 GCP에 Kubernetes 기반 배포 환경을 구축했습니다.
 
-[![CI](https://github.com/lty02-ops/Photo-storage/actions/workflows/ci.yml/badge.svg)](https://github.com/lty02-ops/Photo-storage/actions/workflows/ci.yml)
-
 ## 주요 기능
 
 - Google, Naver, Kakao 소셜 로그인 기능
@@ -32,7 +30,7 @@
 ![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?style=flat-square&logo=kubernetes&logoColor=white)
 ![Helm](https://img.shields.io/badge/Helm-0F1689?style=flat-square&logo=helm&logoColor=white)
 ![Terraform](https://img.shields.io/badge/Terraform-844FBA?style=flat-square&logo=terraform&logoColor=white)
-![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white)
+![Jenkins](https://img.shields.io/badge/Jenkins-D24939?style=flat-square&logo=jenkins&logoColor=white)
 
 ### Cloud
 
@@ -96,36 +94,40 @@ S3와 GCS간 사진 복제는 Spring Boot Worker를 이용하여 비동기로 �
 
 ![소셜 로그인과 CI](docs/images/Photo_Storage_login.png)
 
-GitHub Actions를 이용해 코드 변경 시 Backend Test, Frontend Build, Helm Lint, Terraform Validate를 실행하여 애플리케이션 코드와 배포 설정을 검증하도록 구성했습니다.
+Jenkins를 이용해 코드 변경 시 Backend Test, Frontend Build, Helm Lint, Terraform Validate를 실행하여 애플리케이션 코드와 배포 설정을 검증하도록 구성했습니다.
 
-Frontend와 Backend는 각각 Docker 이미지로 빌드하여 AWS ECR과 Google Artifact Registry에 저장하고 EKS와 GKE에서 해당 이미지를 가져와 실행할 수 있도록 구성했습니다.
+Frontend와 Backend는 각각 Docker 이미지로 빌드하여 AWS ECR과 Google Artifact Registry에 저장하고 EKS와 GKE에서 해당 이미지를 가져와 실행하도록 구성했습니다.
 
-AWS와 GCP의 인프라 및 VPN 환경은 Terraform으로 관리하고 Kubernetes 애플리케이션 배포는 Helm을 사용했습니다.
+AWS와 GCP의 인프라 및 VPN 환경은 Terraform으로 관리하고 Kubernetes 애플리케이션 배포에는 Helm을 사용했습니다.
 
-Terraform을 이용한 인프라 변경과 Helm 배포는 GitHub Actions에서 자동으로 실행하지 않고 수동으로 구성했습니다.
+Terraform을 이용한 인프라 변경은 수동으로 진행하며 이미지 빌드·업로드와 Helm 배포는 Jenkins 파이프라인에서 배포 대상을 선택해 실행하도록 구성했습니다.
 
 ## 설치 및 실행 방법
 
-Docker와 Docker Compose가 설치된 환경에서 실행합니다. 로컬에서는 PostgreSQL과 로컬 파일 저장소를 사용하며, 클라우드 간 사진 복제는 비활성화됩니다.
+### AWS·GCP 최초 배포
 
-```bash
-git clone https://github.com/lty02-ops/Photo-storage.git
-cd Photo-storage
-cp infra/.env.example infra/.env
-```
+AWS·GCP 최초 배포·재배포는 [배포 순서 안내](docs/redeployment.md)를 참고합니다. GCP 서비스 계정 생성 → AWS → GCP 전체 → VPN → 이미지 업로드 → Helm 순서로 진행하며, 새 출력값과 소셜 로그인 주소를 반영해야 합니다.
 
-Windows PowerShell에서는 `Copy-Item infra/.env.example infra/.env`를 사용합니다.
+### Jenkins 배포 설정
 
-`infra/.env`에 데이터베이스 비밀번호와 각 소셜 로그인 서비스에서 발급받은 Client 정보를 입력합니다.
+앱 배포 자동화를 시작하려면 다음을 준비합니다.
 
-```bash
-cd infra
-docker compose up --build
-```
+1. [배포 순서 안내](docs/redeployment.md)대로 인프라·VPN을 만들고 앱을 한 번 배포합니다. 실제 DB·스토리지·로그인 주소가 설정된 `photo-storage` 네임스페이스의 Helm 릴리스가 있어야 합니다. 파이프라인은 인프라를 생성하지 않습니다.
+2. Jenkins에 `photo-storage-deploy` 노드와 같은 이름의 라벨을 만들고, 기존 CI 노드와 동일한 inbound 연결 방식을 선택합니다. Remote root directory는 `/home/jenkins/agent`입니다.
+3. WSL에서 `AGENT_ROLE=deploy bash infra/jenkins/connect-agent.sh`를 실행하고 **새 배포 노드의 Secret**을 입력합니다. 이 노드는 로컬 Docker 소켓을 사용하므로 신뢰하는 main 배포 작업 전용으로 사용합니다.
+4. Jenkins Credentials에 아래 파일을 **Secret file**로 등록합니다. 인증 파일을 저장소에 커밋하지 않습니다.
 
-실행 후 http://localhost:3000 으로 접속합니다. 종료할 때는 `infra` 디렉터리에서 `docker compose down`을 실행합니다.
+| Credential ID | 파일 |
+|---|---|
+| `photo-storage-aws-credentials` | `[default]` 프로필의 AWS credentials 파일. 세션 인증이면 세션 토큰도 포함 |
+| `photo-storage-gcp-credentials` | `gcloud auth login --cred-file`이 지원하는 배포용 인증 설정. WIF 설정을 권장하며 외부 토큰 소스도 배포 노드에서 접근 가능해야 함 |
 
-AWS·GCP 배포 절차는 [클라우드 배포](docs/deployment.md)를 참고합니다.
+배포 계정은 해당 Registry 업로드, 클러스터 조회와 앱 Helm 리소스 변경 권한이 필요합니다. GCP 인증 파일은 로컬 ADC 파일을 그대로 복사하는 방식과 다릅니다. 사용하는 계정·프로젝트를 바꾸면 Jenkinsfile의 배포 환경변수도 수정합니다.
+
+5. 변경 파일을 푸시한 뒤 Build Now를 한 번 실행해 매개변수를 등록하고, **Build with Parameters → DEPLOY_TARGET**에서 배포 대상을 선택합니다. 기존에 만든 일반 Pipeline은 SCM 브랜치를 `*/main`으로 유지합니다.
+6. 첫 배포를 확인한 뒤 푸시마다 자동 배포하려면 Jenkinsfile의 선택지 첫 값을 원하는 대상으로 바꿉니다. 예: `choices: ['gcp', 'none', 'aws', 'both']`. 변경을 푸시하고 한 번 실행하면 이후 main의 SCM 변경 감지 빌드는 기본값 `gcp`로 배포합니다. PC·Jenkins·두 실행 노드가 켜져 있어야 합니다.
+
+PR 검증은 별도 검증 작업으로 구성하고 배포 Credentials와 배포 노드 접근 권한을 주지 않습니다. 배포 설정은 신뢰하는 main의 Jenkinsfile에서만 읽도록 유지합니다.
 
 ## Trouble Shooting
 
