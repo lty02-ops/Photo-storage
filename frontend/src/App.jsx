@@ -1,12 +1,12 @@
-import { Download, Link, RefreshCw, Trash2, UploadCloud, X } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { Download, Image as ImageIcon, Link, RefreshCw, Trash2, UploadCloud, X } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import "./styles.css";
 
 const API_BASE_URL = ""; // use relative paths and rely on Vite dev proxy
 const SOCIAL_PROVIDERS = [
   { id: "naver", icon: "N", label: "\uB124\uC774\uBC84 \uB85C\uADF8\uC778" },
   { id: "kakao", icon: "\u25CF", label: "\uCE74\uCE74\uC624 \uB85C\uADF8\uC778" },
-  { id: "google", icon: "G", label: "Google \uB85C\uADF8\uC778" },
+  { id: "google", icon: "G", label: "구글 로그인" },
 ];
 
 export default function App() {
@@ -36,7 +36,7 @@ export default function App() {
     fetch(`${API_BASE_URL}/api/system/info`)
       .then((response) => {
         if (!response.ok) {
-          throw new Error("Failed to load system info");
+          throw new Error("서버 정보를 불러오지 못했습니다.");
         }
         return response.json();
       })
@@ -58,7 +58,7 @@ export default function App() {
       const socialSession = { token, user: { id, email, role } };
       localStorage.setItem("photo-storage-session", JSON.stringify(socialSession));
       setSession(socialSession);
-      setMessage(`Logged in as ${email}`);
+      setMessage(`${email} 계정으로 로그인했습니다.`);
       window.history.replaceState({}, "", "/");
     }
   }, []);
@@ -87,8 +87,8 @@ export default function App() {
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: "Request failed." }));
-      throw new Error(error.message || "Request failed.");
+      const error = await response.json().catch(() => ({ message: "요청을 처리하지 못했습니다." }));
+      throw new Error(error.message || "요청을 처리하지 못했습니다.");
     }
 
     if (response.status === 204) {
@@ -117,7 +117,7 @@ export default function App() {
       if (authMode === "signup") {
         setAuthMode("login");
         setPassword("");
-        setMessage("Signup complete. Please log in.");
+        setMessage("회원가입이 완료되었습니다. 로그인해주세요.");
         return;
       }
 
@@ -148,7 +148,7 @@ export default function App() {
     const form = event.currentTarget;
     const file = form.elements.photo.files[0];
     if (!file) {
-      setMessage("Choose a photo first.");
+      setMessage("먼저 업로드할 사진을 선택해주세요.");
       return;
     }
 
@@ -161,7 +161,7 @@ export default function App() {
         body: formData,
       });
       form.reset();
-      setMessage("Photo uploaded.");
+      setMessage("사진을 업로드했습니다.");
       await loadPhotos();
     } catch (error) {
       setMessage(error.message);
@@ -178,9 +178,9 @@ export default function App() {
 
     try {
       await navigator.clipboard.writeText(absoluteUrl);
-      setMessage(`Share link copied: ${absoluteUrl}`);
+      setMessage(`공유 링크를 복사했습니다: ${absoluteUrl}`);
     } catch {
-      setMessage(`Share link created: ${absoluteUrl}`);
+      setMessage(`공유 링크를 만들었습니다: ${absoluteUrl}`);
     }
   } catch (error) {
     setMessage(error.message);
@@ -193,7 +193,7 @@ export default function App() {
         headers: authHeaders,
       });
       if (!response.ok) {
-        throw new Error("Download failed.");
+        throw new Error("사진을 내려받지 못했습니다.");
       }
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
@@ -215,7 +215,7 @@ export default function App() {
         headers: authHeaders,
       });
       if (!response.ok) {
-        throw new Error("Preview failed.");
+        throw new Error("사진 미리보기를 불러오지 못했습니다.");
       }
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
@@ -246,10 +246,10 @@ export default function App() {
         headers: authHeaders,
       });
       if (!response.ok) {
-        const error = await response.json().catch(() => ({ message: "Delete failed." }));
+        const error = await response.json().catch(() => ({ message: "사진을 삭제하지 못했습니다." }));
         throw new Error(error.message);
       }
-      setMessage("Photo deleted.");
+      setMessage("사진을 삭제했습니다.");
       await loadPhotos();
     } catch (error) {
       setMessage(error.message);
@@ -268,12 +268,10 @@ export default function App() {
         <div className="brand">
           <UploadCloud size={26} aria-hidden="true" />
           <div>
-            <h1>Photo Storage</h1>
+            <h1>사진 보관함</h1>
             {systemInfo && (
               <p className="cloud-info">
-                Served by {systemInfo.cloudProvider}
-                {" · "}
-                {systemInfo.podName}
+                {cloudLabel(systemInfo.cloudProvider)}에서 연결 중
               </p>
             )}
           </div>
@@ -281,7 +279,7 @@ export default function App() {
         {session && (
           <div className="account">
             <span>{session.user.email}</span>
-            <button type="button" onClick={logout}>Logout</button>
+            <button type="button" onClick={logout}>로그아웃</button>
           </div>
         )}
       </section>
@@ -298,7 +296,7 @@ export default function App() {
                   setAuthError("");
                 }}
               >
-                Login
+                로그인
               </button>
               <button
                 type="button"
@@ -309,11 +307,11 @@ export default function App() {
                   setMessage("");
                 }}
               >
-                Signup
+                회원가입
               </button>
             </div>
             <label>
-              Email
+              이메일
               <input
                 value={email}
                 onChange={(event) => {
@@ -325,7 +323,7 @@ export default function App() {
               />
             </label>
             <label>
-              Password
+              비밀번호
               <input
                 value={password}
                 onChange={(event) => {
@@ -339,9 +337,9 @@ export default function App() {
             {authError && <p className="auth-error">{authError}</p>}
             {message && <p className="auth-success">{message}</p>}
             <button className="primary auth-submit" type="submit" disabled={isBusy}>
-              {isBusy ? "Please wait" : authMode === "login" ? "Login" : "Create Account"}
+              {isBusy ? "처리 중…" : authMode === "login" ? "로그인" : "회원가입"}
             </button>
-            <div className="social-divider">or</div>
+            <div className="social-divider">또는 소셜 계정으로 로그인</div>
             <div className="social-actions">
               {SOCIAL_PROVIDERS.map((provider) => (
                 <button
@@ -361,29 +359,29 @@ export default function App() {
         <section className="workspace">
           <form className="upload-band" onSubmit={handleUpload}>
             <div>
-              <h2>Upload Photo</h2>
-              <p>Images up to 10 MB are stored through the backend storage interface.</p>
+              <h2>사진 올리기</h2>
+              <p>최대 10메가바이트의 이미지를 올릴 수 있어요.</p>
             </div>
-            <input name="photo" type="file" accept="image/*" />
+            <input name="photo" type="file" accept="image/*" aria-label="업로드할 사진 선택" />
             <button className="primary" type="submit">
               <UploadCloud size={18} aria-hidden="true" />
               Upload
             </button>
           </form>
 
-          {message && <p className="message">{message}</p>}
+          {message && <p className="message" role="status">{message}</p>}
 
           <div className="dashboard-grid">
             <section className="photo-section">
               <div className="section-heading">
-                <h2>My Photos</h2>
-                <button type="button" className="icon-button" onClick={loadPhotos} title="Refresh" aria-label="Refresh photos">
+                <h2>내 사진 <small className="photo-count">{photos.length}장</small></h2>
+                <button type="button" className="icon-button" onClick={loadPhotos} title="새로고침" aria-label="사진 목록 새로고침">
                   <RefreshCw className={isRefreshing ? "spin" : ""} size={18} aria-hidden="true" />
                 </button>
               </div>
               <div className="photo-list">
                 {photos.length === 0 ? (
-                  <p className="empty">No photos uploaded yet.</p>
+                  <p className="empty">아직 보관한 사진이 없어요. 첫 사진을 올려보세요.</p>
                 ) : (
                   photos.map((photo) => (
                     <article
@@ -398,13 +396,20 @@ export default function App() {
                       }}
                       role="button"
                       tabIndex={0}
-                      title="Open photo preview"
+                      title="사진 미리보기"
                     >
-                      <div>
+                      <div className="photo-summary">
+                        <PhotoThumbnail photoId={photo.id} token={session.token} />
+                        <div className="photo-details">
                         <strong>{photo.originalFilename}</strong>
-                        <span>
-                          {formatBytes(photo.sizeBytes)} | {photo.storageProvider} | {photo.replicationStatus}
-                        </span>
+                        <div className="photo-meta">
+                          <span>{formatBytes(photo.sizeBytes)}</span>
+                          <span className="storage-badge">{storageLabel(photo.storageProvider)}에 원본 저장</span>
+                          <span className={`replication-badge status-${photo.replicationStatus?.toLowerCase()}`}>
+                            {replicationLabel(photo)}
+                          </span>
+                        </div>
+                        </div>
                       </div>
                       <div className="actions">
                         <button
@@ -414,7 +419,7 @@ export default function App() {
                             event.stopPropagation();
                             downloadPhoto(photo);
                           }}
-                          title="Download"
+                          title="내려받기" aria-label="사진 내려받기"
                         >
                           <Download size={18} aria-hidden="true" />
                         </button>
@@ -425,7 +430,7 @@ export default function App() {
                             event.stopPropagation();
                             createShareLink(photo.id);
                           }}
-                          title="Create share link"
+                          title="공유 링크 만들기" aria-label="사진 공유 링크 만들기"
                         >
                           <Link size={18} aria-hidden="true" />
                         </button>
@@ -436,7 +441,7 @@ export default function App() {
                             event.stopPropagation();
                             deletePhoto(photo.id);
                           }}
-                          title="Delete"
+                          title="삭제" aria-label="사진 삭제"
                         >
                           <Trash2 size={18} aria-hidden="true" />
                         </button>
@@ -454,7 +459,7 @@ export default function App() {
               <div className="preview-dialog" onClick={(event) => event.stopPropagation()}>
                 <div className="preview-heading">
                   <strong>{previewPhoto.filename}</strong>
-                  <button type="button" className="icon-button" onClick={closePhotoPreview} title="Close" aria-label="Close preview">
+                  <button type="button" className="icon-button" onClick={closePhotoPreview} title="닫기" aria-label="미리보기 닫기">
                     <X size={18} aria-hidden="true" />
                   </button>
                 </div>
@@ -468,12 +473,88 @@ export default function App() {
   );
 }
 
+function PhotoThumbnail({ photoId, token }) {
+  const containerRef = useRef(null);
+  const [imageUrl, setImageUrl] = useState(null);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    let objectUrl;
+    let observer;
+    setImageUrl(null);
+    setFailed(false);
+
+    async function load() {
+      observer?.disconnect();
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/photos/${photoId}/download`, {
+          headers: { Authorization: `Bearer ${token}` },
+          signal: controller.signal,
+        });
+        if (!response.ok) throw new Error("사진을 불러오지 못했습니다.");
+        const blob = await response.blob();
+        if (controller.signal.aborted) return;
+        objectUrl = URL.createObjectURL(blob);
+        setImageUrl(objectUrl);
+      } catch (error) {
+        if (error.name !== "AbortError") setFailed(true);
+      }
+    }
+
+    if ("IntersectionObserver" in window) {
+      observer = new IntersectionObserver((entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) load();
+      }, { rootMargin: "160px" });
+      observer.observe(containerRef.current);
+    } else {
+      load();
+    }
+
+    return () => {
+      observer?.disconnect();
+      controller.abort();
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [photoId, token]);
+
+  return (
+    <div ref={containerRef} className="photo-thumbnail"
+      title={failed ? "미리보기를 불러오지 못했습니다. 눌러서 다시 확인하세요." : "사진 미리보기"}>
+      {imageUrl && !failed ? (
+        <img src={imageUrl} alt="" decoding="async" onError={() => setFailed(true)} />
+      ) : (
+        <ImageIcon size={24} aria-hidden="true" />
+      )}
+    </div>
+  );
+}
+
 function formatBytes(bytes) {
   if (bytes < 1024) {
-    return `${bytes} B`;
+    return `${bytes}바이트`;
   }
   if (bytes < 1024 * 1024) {
-    return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / 1024).toFixed(1)}킬로바이트`;
   }
-  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+  return `${(bytes / 1024 / 1024).toFixed(1)}메가바이트`;
+}
+
+function cloudLabel(provider) {
+  return { gcp: "구글 클라우드", aws: "아마존 클라우드", local: "로컬 서버" }[provider] || "서버";
+}
+
+function storageLabel(provider) {
+  return { gcs: "구글 저장소", s3: "아마존 저장소", local: "로컬 저장소" }[provider] || "저장소";
+}
+
+function replicationLabel(photo) {
+  const target = { gcs: "아마존 저장소", s3: "구글 저장소" }[photo.storageProvider];
+  switch (photo.replicationStatus) {
+    case "COMPLETED": return target ? `${target} 복제 완료` : "복제 완료";
+    case "PENDING": return "복제 대기 중";
+    case "FAILED": return "복제 실패";
+    case "NOT_REQUIRED": return "복제 대상 없음";
+    default: return "복제 상태 확인 중";
+  }
 }

@@ -2,7 +2,7 @@ frontend:
   service:
     type: NodePort
   image:
-    repository: asia-northeast3-docker.pkg.dev/project-62b51d1b-b1c4-4053-bb0/photo-storage/photo-storage-frontend
+    repository: asia-northeast3-docker.pkg.dev/photo-storage-503901/photo-storage/photo-storage-frontend
     tag: latest
     pullPolicy: IfNotPresent
 
@@ -18,7 +18,7 @@ backend:
     create: true
     name: photo-storage-backend
     annotations:
-      iam.gke.io/gcp-service-account: photo-storage-backend@project-62b51d1b-b1c4-4053-bb0.iam.gserviceaccount.com
+      iam.gke.io/gcp-service-account: photo-storage-backend@photo-storage-503901.iam.gserviceaccount.com
 
   awsWorkloadIdentity:
     enabled: true
@@ -28,7 +28,7 @@ backend:
 
 
   image:
-    repository: asia-northeast3-docker.pkg.dev/project-62b51d1b-b1c4-4053-bb0/photo-storage/photo-storage-backend
+    repository: asia-northeast3-docker.pkg.dev/photo-storage-503901/photo-storage/photo-storage-backend
     tag: latest
     pullPolicy: IfNotPresent
 
@@ -37,7 +37,7 @@ backend:
     storageProvider: gcs
     replicationEnabled: true
     replicationTargetProvider: s3
-    gcsBucketName: project-62b51d1b-b1c4-4053-bb0-photo-storage-bucket
+    gcsBucketName: photo-storage-503901-photo-storage-bucket
     s3BucketName: photo-storage-bucket-dev-lty02
     frontendUrl: https://photo-storage.example.com
     datasourceUrl: jdbc:postgresql://photo-storage-db.cr000kkwg7nd.ap-northeast-2.rds.amazonaws.com:5432/photo_storage

@@ -11,6 +11,9 @@ frontend:
 backend:
   replicaCount: 1
 
+  probes:
+    enabled: false
+
   healthCheck:
     enabled: false
     path: /actuator/health

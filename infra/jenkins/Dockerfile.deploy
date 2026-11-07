@@ -1,0 +1,22 @@
+FROM docker:28-cli AS docker_cli
+FROM photo-storage-ci-agent:local
+
+USER root
+COPY --from=docker_cli /usr/local/bin/docker /usr/local/bin/docker
+COPY --from=docker_cli /usr/local/libexec/docker/cli-plugins/docker-buildx /usr/local/libexec/docker/cli-plugins/docker-buildx
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl gnupg unzip python3 \
+    && curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg \
+       | gpg --dearmor -o /usr/share/keyrings/google-cloud.gpg \
+    && echo 'deb [signed-by=/usr/share/keyrings/google-cloud.gpg] https://packages.cloud.google.com/apt cloud-sdk main' \
+       > /etc/apt/sources.list.d/google-cloud-sdk.list \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends google-cloud-cli google-cloud-cli-gke-gcloud-auth-plugin kubectl \
+    && case "$(dpkg --print-architecture)" in amd64) aws_arch=x86_64 ;; arm64) aws_arch=aarch64 ;; *) exit 1 ;; esac \
+    && curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-${aws_arch}.zip" -o /tmp/awscli.zip \
+    && unzip -q /tmp/awscli.zip -d /tmp \
+    && /tmp/aws/install \
+    && rm -rf /tmp/aws /tmp/awscli.zip /var/lib/apt/lists/*
+
+USER jenkins

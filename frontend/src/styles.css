@@ -2,7 +2,7 @@
   color: #1e252f;
   background: #f5f7fa;
   font-family:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "맑은 고딕", "Apple SD Gothic Neo", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
     sans-serif;
 }
 
@@ -72,7 +72,7 @@ body {
 .upload-band,
 .photo-section {
   border: 1px solid #d9e0ea;
-  border-radius: 8px;
+  border-radius: 16px;
   background: #ffffff;
   box-shadow: 0 12px 32px rgba(24, 33, 47, 0.06);
 }
@@ -329,6 +329,117 @@ button:disabled {
   color: #5b6675;
 }
 
+.photo-details {
+  min-width: 0;
+}
+
+.photo-summary {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.photo-thumbnail {
+  display: grid;
+  place-items: center;
+  flex: 0 0 72px;
+  width: 72px;
+  height: 72px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #edf2f8;
+  color: #8494a8;
+}
+
+.photo-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-count {
+  display: inline-block;
+  padding: 3px 9px;
+  margin-left: 6px;
+  border-radius: 999px;
+  background: #edf3fc;
+  color: #3264a3;
+  font-size: 0.78rem;
+  font-weight: 600;
+  vertical-align: middle;
+}
+
+.photo-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  margin-top: 10px;
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+.photo-meta span {
+  margin-top: 0;
+}
+
+.photo-meta .storage-badge,
+.photo-meta .replication-badge {
+  padding: 3px 9px;
+  border-radius: 6px;
+  background: #edf2f8;
+  color: #465b75;
+}
+
+.photo-meta .status-completed {
+  background: #eaf7ef;
+  color: #21734a;
+}
+
+.photo-meta .status-failed {
+  background: #fff0ee;
+  color: #b42318;
+}
+
+.photo-meta .status-pending {
+  background: #fff7e7;
+  color: #8a5c0b;
+}
+
+input[type="file"] {
+  padding: 8px;
+  background: #f8fafc;
+  min-width: 0;
+}
+
+input::file-selector-button {
+  margin-right: 12px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: #e8eef8;
+  color: #304e78;
+  font: inherit;
+  cursor: pointer;
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid #a5c7ff;
+  outline-offset: 3px;
+}
+
+.account {
+  flex-wrap: wrap;
+  overflow-wrap: anywhere;
+}
+
+.message {
+  overflow-wrap: anywhere;
+}
+
 .actions {
   gap: 8px;
 }
@@ -432,5 +543,15 @@ button:disabled {
 
   .actions {
     justify-content: flex-end;
+  }
+
+  .photo-summary {
+    gap: 12px;
+  }
+
+  .photo-thumbnail {
+    flex-basis: 56px;
+    width: 56px;
+    height: 56px;
   }
 }

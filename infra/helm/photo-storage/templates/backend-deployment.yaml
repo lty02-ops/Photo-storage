@@ -21,6 +21,21 @@ spec:
           imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.backend.service.port }}
+          {{- if and .Values.backend.probes .Values.backend.probes.enabled }}
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: {{ .Values.backend.service.port }}
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 60
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: {{ .Values.backend.service.port }}
+            periodSeconds: 5
+            timeoutSeconds: 3
+          {{- end }}
           env:
             - name: POD_NAME
               valueFrom:

@@ -13,10 +13,10 @@ backend:
 
   gcpWorkloadIdentity:
     enabled: true
-    projectNumber: "1079817536617"
+    projectNumber: "56305810522"
     poolId: photo-storage-aws-eks
     providerId: photo-storage-eks
-    serviceAccountEmail: photo-storage-backend@project-62b51d1b-b1c4-4053-bb0.iam.gserviceaccount.com
+    serviceAccountEmail: photo-storage-backend@photo-storage-503901.iam.gserviceaccount.com
 
   image:
     repository: 022868553365.dkr.ecr.ap-northeast-2.amazonaws.com/photo-storage-backend
@@ -29,7 +29,7 @@ backend:
     replicationEnabled: true
     replicationTargetProvider: gcs
     s3BucketName: photo-storage-bucket-dev-lty02
-    gcsBucketName: project-62b51d1b-b1c4-4053-bb0-photo-storage-bucket
+    gcsBucketName: photo-storage-503901-photo-storage-bucket
     frontendUrl: https://photo-storage.example.com
     datasourceUrl: jdbc:postgresql://photo-storage-db.cr000kkwg7nd.ap-northeast-2.rds.amazonaws.com:5432/photo_storage
     datasourceUsername: photo_user
