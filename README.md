@@ -92,7 +92,7 @@ S3와 GCS간 사진 복제는 Spring Boot Worker를 이용하여 비동기로 �
 
 ### CI 및 배포
 
-![소셜 로그인과 CI](docs/images/Photo_Storage_login.png)
+![Jenkins CI 및 배포](docs/images/Photo_Storage_login.png)
 
 Jenkins를 이용해 코드 변경 시 Backend Test, Frontend Build, Helm Lint, Terraform Validate를 실행하여 애플리케이션 코드와 배포 설정을 검증하도록 구성했습니다.
 
